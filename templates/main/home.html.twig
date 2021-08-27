@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home{% endblock %}
+
+{% block body %}
+<h1>Liste de courses</h1>
+
+  	<form action="{{ path('ajouter')}}" method="post">
+			<div class="row">
+
+				<div class="col-6"><input placeholder="Entrer article" name="nomArticle" class="form-control"></div>
+        <div class="col-4"><input type="number" min="0" name="nbArticle" class="form-control"></div>
+				<div class="col-2">
+					<button type="submit" class="btn btn-success">
+						<i class="fas fa-plus"></i>
+					</button>
+				</div>
+			</div>
+		</form>
+
+<table class="table table-striped mt-4">
+
+  <thead>
+    <tr>
+      <th scope="col">Article</th>
+      <th scope="col">Quantité</th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+      {% for a in articles %}
+  <tbody>
+    <tr class = {% if a.isOk == true %} "table-danger" {% else %} "" {% endif %}>
+      <td class={% if a.isOk == true %}"invisible"{% else %} "visible" {% endif %}>{{ a.nom }}</td>
+      <td class={% if a.isOk == true %}"invisible"{% else %} "visible"{% endif %}>{{ a.quantite }}</td>
+      <td><a href="{{ path('modifier',{ id:a.id }) }}" class="btn btn-primary">
+      <i class="fas fa-check"></i></a></td>
+      <td><a href="{{ path('supprimer',{ id:a.id }) }}" class="btn btn-danger">
+      <i class="fas fa-trash"></i></a></td>
+    </tr>
+  </tbody>
+  {% endfor %}
+</table>
+
+
+
+{% endblock %}
