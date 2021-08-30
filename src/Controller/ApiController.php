@@ -70,4 +70,16 @@ class ApiController extends AbstractController
 
         return $this->json($article);
     }
+
+    /**
+     * @Route("/api/article/{id}", name="api_acheter", methods={"PUT"})
+     */
+    public function acheter(Article $article, EntityManagerInterface $em): Response
+    {
+        // changer son etat 
+        $nouvel_etat = ! $article->getIsOk();
+        $article->setIsOk($nouvel_etat);
+        $em->flush();
+        return $this->json($article);
+    }
 }
