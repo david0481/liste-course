@@ -46,7 +46,7 @@ class ApiController extends AbstractController
      /**
      * @Route("/api/article/{id}", name="api_modifier", methods={"PUT"})
      */
-    public function modifier(Article $article,Request $req,EntityManagerInterface $em): Response
+    public function modifier(Article $a,Request $req,EntityManagerInterface $em): Response
     {
        // objet PHP = un objet JS (body) 
        $objet = json_decode($req ->getContent());
@@ -57,11 +57,11 @@ class ApiController extends AbstractController
 
        $em->flush();
 
-        return $this->json($article);
+        return $this->json($a);
     }
 
      /**
-     * @Route("/api/article{id}", name="api_delete", methods={"DELETE"})
+     * @Route("/api/article/{id}", name="api_delete", methods={"DELETE"})
      */
     public function delete(Article $article, EntityManagerInterface $em): Response
     {
