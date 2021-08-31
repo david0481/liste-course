@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Création d'un tableau HTML avec JS</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="offset-3 col-6 pt-4">
+        <!-- integration du tableau avec template-->
+        <br /><br />
+        <input id="nom" placeholder="Saisir un article" />
+        <input id="quantite" placeholder="Saisir quantite" />
+        <button class="btn btn-success" onclick="ajouter()">
+          <i class="fa fa-plus"></i>
+        </button>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Article</th>
+              <th>Etat</th>
+              <th colspan="2">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Template-->
+    <template id="ligneTableau">
+      <tr>
+        <td class="nom">poire</td>
+        <td class="status">true</td>
+        <td>
+          <button class="btn btn-primary" onclick="check(this)">
+            <i class="fa fa-check"></i>
+          </button>
+        </td>
+        <td>
+          <button class="btn btn-danger" onclick="effacer(this)">
+            <i class="fa fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    </template>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
+      integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script>
+      let url = "http://localhost/projet-liste-course/public/api/article";
+      //----------------------
+      function getLigne(article) {
+        let template = document.getElementById("ligneTableau");
+        // je clone le template
+        // cloan == <tr>..</tr>
+        let clone = template.content.cloneNode(true);
+        // je met le clone dans le tbody
+        clone.querySelector(".nom").innerHTML = article.nom;
+        clone.querySelector(".quantite").innerHTML = article.quantite;
+        clone.querySelector(".status").innerHTML = article.isOk;
+        clone.querySelector("tr").setAttribute("data-id", article.id);
+        if (article.isBought) {
+          clone.querySelector("tr").setAttribute("class", "table-danger");
+        }
+        return clone; //<tr>...</tr>
+      }
+
+      function ajouter() {
+        let nameArticle = document.getElementById("nom").value;
+        document.getElementById("nom").value = ""; // je vide le champ input
+        let quantiteArticle = document.getElementById("quantite").value;
+        document.getElementById("quantite").value = ""; // je vide le champ input
+        let body = { nom: nameArticle,
+                    quantite: quantiteArticle };
+
+        axios.post(url, body).then((response) => {
+          let article = response.data;
+          let tbody = document.getElementById("tbody");
+          //let article = { id: 0, name: "mangue", isBought: false };
+          let tr = getLigne(article);
+          tbody.appendChild(tr);
+        });
+      }
+      // Rechercher le tableau JS de articles.
+      axios.get(url).then((response) => {
+        let articles = response.data;
+        //console.log(articles);
+        for (let article of articles) {
+          //console.log(article);
+          let tr = getLigne(article);
+          tbody.appendChild(tr);
+        }
+      });
+      function check(element) {
+        // btn ->td -> tr
+        let tr = element.parentElement.parentElement;
+        let id = tr.getAttribute("data-id");
+        //console.log(id);
+        let url2 = url + "/" + id;
+        axios.put(url2).then((response) => {
+          let article = response.data;
+          tr.querySelector(".status").innerHTML = article.isOk;
+          if (article.isOk) {
+            tr.setAttribute("class", "table-danger");
+          } else {
+            tr.setAttribute("class", "");
+          }
+        });
+      }
+      function effacer(element) {
+        // btn ->td -> tr
+        let tr = element.parentElement.parentElement;
+        //let id = tr.getAttribute("data-id");
+        let id = tr.dataset.id;
+        //console.log(id);
+        let url2 = url + "/" + id;
+        axios.delete(url2).then((response) => {
+          tr.remove();
+        });
+      }
+    </script>
+  </body>
+</html>

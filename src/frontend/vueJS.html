@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Création d'un tableau HTML avec JS</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="offset-3 col-6 pt-4"></div>
+      <div id="app">
+        <h1>{{ titre }}</h1>
+        <input v-model="nom" />
+        <input v-model="quantite" />
+        <button class="btn btn-success" @click="afficher()">
+          <i class="fa fa-plus"></i>
+        </button>
+
+        <table class="table table-striped">
+          <thead>
+            <th>Article</th>
+            <th>Quantite</th>
+            <th></th>
+          </thead>
+          <tbody>
+            <tr v-for="(a, indice) in articles">
+              <td>{{ a.nom }}</td>
+              <td>{{ a.quantite }}</td>
+              <td>
+                <button class="btn btn-primary" @click="getId(indice)">
+                  <i class="fa fa-check"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
+      integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script>
+      const app = new Vue({
+        el: "#app",
+        data: {
+          nom: "",
+          quantite: "",
+          titre: "Hello !",
+          articles: this.articles,
+        },
+        methods: {
+          afficher() {
+            console.log(this.nom);
+            this.articles.push(this.nom);
+            this.nom = ""; // vider le champ input
+            console.log(this.quantite);
+            this.articles.push(this.quantite);
+            this.quantite = ""; // vider le champ input
+          },
+          effacer(indice) {
+            console.log(indice);
+            this.articles.splice(indice, 1); // 1 -> le nd de lignes à effacer
+          },
+          getId(indice) {
+            // comment afficher l'Id
+            let id = this.articles[indice].id;
+            console.log(id);
+          },
+        },
+        mounted() {
+          let url =
+            "http://localhost/projet-liste-course/public/api/article";
+          axios.get(url).then((response) => {
+            console.log(response.data);
+            let articles = response.data;
+            // pas necessaire
+            //normalement this.articles = response.data;
+            this.articles = [];
+
+            for (let a of articles) {
+              this.articles.push(a.nom);
+              this.articles.push(a.quantite);
+              this.articles.push(a.isOk);
+              this.articles.push(a.id);
+            }
+
+          });
+        },
+      });
+    </script>
+  </body>
+</html>
