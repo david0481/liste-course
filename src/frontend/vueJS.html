@@ -26,7 +26,7 @@
         <h1>{{ titre }}</h1>
         <input v-model="nom" />
         <input v-model="quantite" />
-        <button class="btn btn-success" @click="afficher()">
+        <button class="btn btn-success" @click="ajouter()">
           <i class="fa fa-plus"></i>
         </button>
 
@@ -34,12 +34,14 @@
           <thead>
             <th>Article</th>
             <th>Quantite</th>
+            <th>Etat</th>
             <th></th>
           </thead>
           <tbody>
-            <tr v-for="(a, indice) in articles">
+            <tr v-for="(a, indice) of articles">
               <td>{{ a.nom }}</td>
               <td>{{ a.quantite }}</td>
+              <td>{{ a.isOk }}</td>
               <td>
                 <button class="btn btn-primary" @click="getId(indice)">
                   <i class="fa fa-check"></i>
@@ -64,16 +66,17 @@
           nom: "",
           quantite: "",
           titre: "Hello !",
-          articles: this.articles,
+          articles: [],
+          url: "http://localhost/projet-liste-course/public/api/article",
         },
         methods: {
-          afficher() {
-            console.log(this.nom);
-            this.articles.push(this.nom);
-            this.nom = ""; // vider le champ input
-            console.log(this.quantite);
-            this.articles.push(this.quantite);
-            this.quantite = ""; // vider le champ input
+          ajouter() {
+            let body = {nom: this.nom };
+            axios.post(this.url, body).then((response) => {
+            let article = response.data;
+            this.articles.push(article);
+            console.log(this.articles);
+            });
           },
           effacer(indice) {
             console.log(indice);
@@ -86,22 +89,9 @@
           },
         },
         mounted() {
-          let url =
-            "http://localhost/projet-liste-course/public/api/article";
           axios.get(url).then((response) => {
-            console.log(response.data);
-            let articles = response.data;
-            // pas necessaire
-            //normalement this.articles = response.data;
-            this.articles = [];
-
-            for (let a of articles) {
-              this.articles.push(a.nom);
-              this.articles.push(a.quantite);
-              this.articles.push(a.isOk);
-              this.articles.push(a.id);
-            }
-
+            this.articles = response.data;
+            console.log(this.articles);
           });
         },
       });
